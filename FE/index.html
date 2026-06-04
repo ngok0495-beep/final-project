@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clothing Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
+<style>
+:root {
+  --bg: #f5f4f0;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --border: rgba(0,0,0,0.1);
+  --border2: rgba(0,0,0,0.18);
+  --text: #1a1917;
+  --muted: #6b6a65;
+  --hint: #9e9c97;
+  --accent: #2a6041;
+  --accent-light: #e4f0e9;
+  --accent-text: #1a4029;
+  --danger: #b83232;
+  --danger-light: #fdf0f0;
+  --warn: #a06218;
+  --warn-light: #fdf5e6;
+  --info: #1a4d8f;
+  --info-light: #eaf1fb;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --sidebar: 220px;
+  --topbar: 56px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* ── Auth layout ─────────────────────────────── */
+#auth-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 16px;
+  padding: 40px 44px;
+  width: 420px;
+  box-shadow: 0 2px 24px rgba(0,0,0,0.06);
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.auth-logo .logo-icon {
+  width: 36px; height: 36px;
+  background: var(--accent);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff;
+  font-size: 18px;
+}
+.auth-logo span {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1;
+  text-align: center;
+  padding: 7px 0;
+  border-radius: 5px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--muted);
+  transition: all .15s;
+  border: none;
+  background: none;
+}
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-group input:focus, .form-group select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(42,96,65,0.1);
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 11px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .15s, transform .1s;
+}
+.btn-primary:hover { background: #1f4f33; }
+.btn-primary:active { transform: scale(0.99); }
+.btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  margin-bottom: 16px;
+  display: none;
+}
+.alert.danger { background: var(--danger-light); color: var(--danger); border: 0.5px solid #f0b8b8; }
+.alert.success { background: var(--accent-light); color: var(--accent-text); border: 0.5px solid #b3d9c4; }
+.alert.show { display: block; }
+
+/* ── App layout ──────────────────────────────── */
+#app-screen { display: none; min-height: 100vh; }
+
+.layout { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--surface);
+  border-right: 0.5px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 16px;
+  border-bottom: 0.5px solid var(--border);
+}
+.sidebar-logo .logo-icon {
+  width: 30px; height: 30px;
+  background: var(--accent);
+  border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 15px;
+}
+.sidebar-logo span {
+  font-size: 14px; font-weight: 600;
+  color: var(--text); letter-spacing: -0.3px;
+}
+
+.nav { padding: 12px 8px; flex: 1; }
+.nav-section {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--hint);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 0 8px;
+  margin: 12px 0 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-weight: 400;
+  transition: all .12s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item i { font-size: 16px; width: 18px; }
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active { background: var(--accent-light); color: var(--accent-text); font-weight: 500; }
+.nav-item.active i { color: var(--accent); }
+
+.sidebar-footer {
+  border-top: 0.5px solid var(--border);
+  padding: 12px 8px;
+}
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+}
+.avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; color: var(--accent-text);
+  flex-shrink: 0;
+}
+.user-chip-info { flex: 1; min-width: 0; }
+.user-chip-name {
+  font-size: 13px; font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.user-chip-role {
+  font-size: 11px; color: var(--muted);
+}
+.btn-icon {
+  background: none; border: none; cursor: pointer;
+  color: var(--hint); padding: 4px;
+  border-radius: 4px;
+  display: flex; align-items: center;
+  transition: color .12s;
+}
+.btn-icon:hover { color: var(--danger); }
+
+/* Main */
+.main { margin-left: var(--sidebar); flex: 1; display: flex; flex-direction: column; }
+
+.topbar {
+  height: var(--topbar);
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 28px;
+  position: sticky; top: 0; z-index: 50;
+  gap: 12px;
+}
+.topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
+.topbar-actions { display: flex; gap: 8px; }
+
+.content { padding: 28px; flex: 1; }
+
+/* ── Page: Dashboard ──────────────────────────── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 6px; }
+.stat-value { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; line-height: 1; }
+.stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+.stat-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.stat-icon.green { background: var(--accent-light); color: var(--accent); }
+.stat-icon.blue { background: var(--info-light); color: var(--info); }
+.stat-icon.orange { background: var(--warn-light); color: var(--warn); }
+.stat-icon.red { background: var(--danger-light); color: var(--danger); }
+
+.section-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+.section-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--border);
+}
+.section-card-header h3 { font-size: 14px; font-weight: 600; }
+.section-card-body { padding: 16px 20px; }
+
+.activity-list { list-style: none; }
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid var(--border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+.activity-dot.green { background: var(--accent); }
+.activity-dot.blue { background: var(--info); }
+.activity-dot.orange { background: var(--warn); }
+.activity-text { font-size: 13px; }
+.activity-time { font-size: 12px; color: var(--hint); margin-top: 2px; }
+
+/* ── Page: Users ──────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  padding: 0 12px;
+  flex: 1;
+  max-width: 360px;
+}
+.search-box i { color: var(--hint); font-size: 16px; }
+.search-box input {
+  border: none;
+  background: none;
+  padding: 9px 0;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .12s;
+  border: 0.5px solid var(--border2);
+  background: var(--surface);
+  color: var(--text);
+}
+.btn:hover { background: var(--surface2); }
+.btn.btn-green {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn.btn-green:hover { background: #1f4f33; }
+.btn.btn-danger {
+  background: var(--danger-light);
+  color: var(--danger);
+  border-color: #f0b8b8;
+}
+.btn.btn-danger:hover { background: #fce8e8; }
+.btn.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Table */
+.table-wrap {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--surface2); }
+th {
+  text-align: left;
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 0.5px solid var(--border);
+}
+td {
+  padding: 12px 16px;
+  font-size: 13.5px;
+  border-bottom: 0.5px solid var(--border);
+  vertical-align: middle;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: var(--surface2); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.badge.admin { background: #ede9fe; color: #4c1d95; }
+.badge.user { background: var(--info-light); color: var(--info); }
+.badge.staff { background: var(--warn-light); color: var(--warn); }
+.badge.active { background: var(--accent-light); color: var(--accent-text); }
+.badge.inactive { background: var(--surface2); color: var(--muted); }
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-top: 0.5px solid var(--border);
+  font-size: 13px;
+  color: var(--muted);
+}
+.page-btns { display: flex; gap: 4px; }
+.page-btn {
+  width: 30px; height: 30px;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px; background: var(--surface);
+  transition: all .12s;
+}
+.page-btn:hover { background: var(--surface2); }
+.page-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ── Page: Profile ────────────────────────────── */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.profile-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  text-align: center;
+}
+.profile-avatar {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 600; color: var(--accent-text);
+  margin: 0 auto 14px;
+}
+.profile-name { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+.profile-email { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+
+.profile-form-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.form-group-inline { margin-bottom: 16px; }
+.form-group-inline label {
+  display: block;
+  font-size: 12px; font-weight: 500;
+  color: var(--muted); margin-bottom: 6px;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+.form-group-inline input, .form-group-inline select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 14px;
+  background: var(--surface); color: var(--text);
+  outline: none;
+  transition: border-color .15s;
+}
+.form-group-inline input:focus, .form-group-inline select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(42,96,65,0.1);
+}
+
+.section-title {
+  font-size: 12px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: 0.6px;
+  margin-bottom: 16px; margin-top: 24px;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--border);
+}
+.section-title:first-child { margin-top: 0; }
+
+/* ── Modal ───────────────────────────────────── */
+.modal-backdrop {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 200;
+  align-items: center; justify-content: center;
+}
+.modal-backdrop.show { display: flex; }
+.modal {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 0.5px solid var(--border2);
+  width: 440px;
+  max-width: 90vw;
+  overflow: hidden;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 0.5px solid var(--border);
+}
+.modal-header h3 { font-size: 15px; font-weight: 600; }
+.modal-body { padding: 20px; }
+.modal-footer {
+  display: flex; justify-content: flex-end; gap: 8px;
+  padding: 14px 20px;
+  border-top: 0.5px solid var(--border);
+}
+
+/* ── Loading / Toast ─────────────────────────── */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: #1a1917; color: #fff;
+  padding: 10px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  z-index: 999; opacity: 0;
+  transform: translateY(8px);
+  transition: all .2s;
+  pointer-events: none;
+}
+#toast.show { opacity: 1; transform: translateY(0); }
+#toast.success { background: var(--accent); }
+#toast.error { background: var(--danger); }
+
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--muted);
+}
+.empty-state i { font-size: 36px; display: block; margin-bottom: 12px; color: var(--hint); }
+
+/* ── Skeleton loader ─────────────────────────── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface2) 25%, #e8e7e1 50%, var(--surface2) 75%);
+  background-size: 200%;
+  animation: shimmer 1.3s infinite;
+  border-radius: 4px;
+}
+@keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ AUTH SCREEN ══════════════════ -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <div class="logo-icon"><i class="ti ti-shirt" aria-hidden="true"></i></div>
+      <span>Clothing Management</span>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Đăng nhập</button>
+      <button class="auth-tab" onclick="switchTab('register')">Đăng ký</button>
+    </div>
+
+    <div id="alert-auth" class="alert danger"></div>
+
+    <!-- Login form -->
+    <div id="form-login">
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"/>
+      </div>
+      <button class="btn-primary" id="btn-login" onclick="doLogin()">Đăng nhập</button>
+    </div>
+
+    <!-- Register form -->
+    <div id="form-register" style="display:none">
+      <div class="form-group">
+        <label>Tên đăng nhập</label>
+        <input type="text" id="reg-username" placeholder="nguyenvana"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="reg-password" placeholder="Tối thiểu 6 ký tự"/>
+      </div>
+      <div class="form-group">
+        <label>Vai trò</label>
+        <select id="reg-role">
+          <option value="User">Người dùng</option>
+          <option value="Staff">Nhân viên</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="btn-register" onclick="doRegister()">Tạo tài khoản</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP SCREEN ══════════════════ -->
+<div id="app-screen">
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon"><i class="ti ti-shirt" aria-hidden="true"></i></div>
+        <span>Clothing</span>
+      </div>
+      <nav class="nav">
+        <div class="nav-section">Tổng quan</div>
+        <button class="nav-item active" onclick="showPage('dashboard')">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard
+        </button>
+
+        <div class="nav-section">Quản lý</div>
+        <button class="nav-item" onclick="showPage('users')" id="nav-users" style="display:none">
+          <i class="ti ti-users" aria-hidden="true"></i> Người dùng
+        </button>
+        <button class="nav-item" onclick="showPage('profile')">
+          <i class="ti ti-user-circle" aria-hidden="true"></i> Hồ sơ cá nhân
+        </button>
+
+        <div class="nav-section">Hệ thống</div>
+        <button class="nav-item" onclick="showComingSoon('Sản phẩm')">
+          <i class="ti ti-hanger" aria-hidden="true"></i> Sản phẩm
+        </button>
+        <button class="nav-item" onclick="showComingSoon('Đơn hàng')">
+          <i class="ti ti-shopping-cart" aria-hidden="true"></i> Đơn hàng
+        </button>
+        <button class="nav-item" onclick="showComingSoon('Kho hàng')">
+          <i class="ti ti-building-warehouse" aria-hidden="true"></i> Kho hàng
+        </button>
+        <button class="nav-item" onclick="showComingSoon('Báo cáo')">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i> Báo cáo
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-chip">
+          <div class="avatar" id="sidebar-avatar">?</div>
+          <div class="user-chip-info">
+            <div class="user-chip-name" id="sidebar-name">—</div>
+            <div class="user-chip-role" id="sidebar-role">—</div>
+          </div>
+          <button class="btn-icon" onclick="doLogout()" title="Đăng xuất">
+            <i class="ti ti-logout" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <div class="main">
+      <header class="topbar">
+        <span class="topbar-title" id="topbar-title">Dashboard</span>
+        <div class="topbar-actions" id="topbar-actions"></div>
+      </header>
+      <div class="content" id="page-content">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MODAL: Add User ══════════════════ -->
+<div class="modal-backdrop" id="modal-add-user">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Thêm người dùng</h3>
+      <button class="btn-icon" onclick="closeModal('modal-add-user')">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-alert" class="alert danger"></div>
+      <div class="form-group">
+        <label>Tên đăng nhập</label>
+        <input type="text" id="modal-username" placeholder="nguyenvana"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="modal-email" placeholder="email@example.com"/>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu</label>
+        <input type="password" id="modal-password" placeholder="Tối thiểu 6 ký tự"/>
+      </div>
+      <div class="form-group">
+        <label>Vai trò</label>
+        <select id="modal-role">
+          <option value="User">Người dùng</option>
+          <option value="Staff">Nhân viên</option>
+          <option value="Admin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-add-user')">Hủy</button>
+      <button class="btn btn-green" id="btn-add-user" onclick="submitAddUser()">
+        <i class="ti ti-plus" aria-hidden="true"></i> Tạo tài khoản
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MODAL: Edit User ══════════════════ -->
+<div class="modal-backdrop" id="modal-edit-user">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Sửa người dùng</h3>
+      <button class="btn-icon" onclick="closeModal('modal-edit-user')">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="edit-modal-alert" class="alert danger"></div>
+      <input type="hidden" id="edit-auth-user-id"/>
+      <div class="form-group">
+        <label>Tên đăng nhập</label>
+        <input type="text" id="edit-username"/>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="edit-email"/>
+      </div>
+      <div class="form-group">
+        <label>Vai trò</label>
+        <select id="edit-role">
+          <option value="User">Người dùng</option>
+          <option value="Staff">Nhân viên</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Họ và tên</label>
+        <input type="text" id="edit-fullname"/>
+      </div>
+      <div class="form-group">
+        <label>Chức vụ</label>
+        <select id="edit-jobtitle">
+          <option value="Khác">Khác</option>
+          <option value="Quản lý">Quản lý</option>
+          <option value="Nhân viên bán hàng">Nhân viên bán hàng</option>
+          <option value="Nhân viên kho">Nhân viên kho</option>
+          <option value="Kế toán">Kế toán</option>
+          <option value="Kinh doanh">Kinh doanh</option>
+          <option value="Kỹ thuật">Kỹ thuật</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Số điện thoại</label>
+        <input type="text" id="edit-phone" placeholder="0901234567"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-edit-user')">Hủy</button>
+      <button class="btn btn-green" id="btn-save-edit-user" onclick="submitEditUser()">
+        <i class="ti ti-device-floppy" aria-hidden="true"></i> Lưu thay đổi
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MODAL: Change Password ══════════════════ -->
+<div class="modal-backdrop" id="modal-change-pw">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Đổi mật khẩu</h3>
+      <button class="btn-icon" onclick="closeModal('modal-change-pw')">
+        <i class="ti ti-x" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="modal-pw-alert" class="alert danger"></div>
+      <div class="form-group">
+        <label>Mật khẩu hiện tại</label>
+        <input type="password" id="old-password" placeholder="••••••••"/>
+      </div>
+      <div class="form-group">
+        <label>Mật khẩu mới</label>
+        <input type="password" id="new-password" placeholder="Tối thiểu 6 ký tự"/>
+      </div>
+      <div class="form-group">
+        <label>Xác nhận mật khẩu mới</label>
+        <input type="password" id="confirm-password" placeholder="••••••••"/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('modal-change-pw')">Hủy</button>
+      <button class="btn btn-green" id="btn-change-pw" onclick="submitChangePw()">
+        <i class="ti ti-lock" aria-hidden="true"></i> Đổi mật khẩu
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ══════════════════ CONFIG ══════════════════
+const AUTH_URL  = 'http://localhost:5001';
+const USER_URL  = 'http://localhost:5002';
+
+
+// ══════════════════ STATE ══════════════════
+let state = {
+  token: localStorage.getItem('cm_token') || null,
+  user: JSON.parse(localStorage.getItem('cm_user') || 'null'),
+  currentPage: 'dashboard',
+  users: [],
+  usersPage: 1,
+  usersTotal: 0,
+  userSearch: '',
+  profile: null,
+};
+
+// ══════════════════ UTILS ══════════════════
+function headers(extra = {}) {
+  return {
+    'Content-Type': 'application/json',
+    ...(state.token ? { 'Authorization': `Bearer ${state.token}` } : {}),
+    ...extra
+  };
+}
+
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show ' + type;
+  setTimeout(() => { el.className = ''; }, 3000);
+}
+
+function showAlert(id, msg, type = 'danger') {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = `alert ${type} show`;
+}
+function hideAlert(id) {
+  document.getElementById(id).className = 'alert danger';
+}
+
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+function initials(name) {
+  if (!name) return '?';
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+}
+
+function roleLabel(r) {
+  return r === 'Admin' ? 'Admin' : r === 'Staff' ? 'Nhân viên' : 'Người dùng';
+}
+function roleBadge(r) {
+  const cls = r === 'Admin' ? 'admin' : r === 'Staff' ? 'staff' : 'user';
+  return `<span class="badge ${cls}">${roleLabel(r)}</span>`;
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('vi-VN');
+}
+
+function setLoading(btnId, loading, text) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  btn.disabled = loading;
+  btn.innerHTML = loading
+    ? `<span class="spinner"></span> ${text || '...'}`
+    : btn.dataset.originalText || text;
+  if (!loading && text) btn.innerHTML = text;
+}
+
+// ══════════════════ AUTH ══════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach((el, i) => {
+    el.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+  });
+  document.getElementById('form-login').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? '' : 'none';
+  hideAlert('alert-auth');
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) { showAlert('alert-auth', 'Vui lòng điền đầy đủ thông tin.'); return; }
+
+  setLoading('btn-login', true, 'Đang đăng nhập...');
+  hideAlert('alert-auth');
+
+  try {
+    const res = await fetch(`${AUTH_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      showAlert('alert-auth', data.message || 'Đăng nhập thất bại.');
+      return;
+    }
+    saveSession(data.token, data.user);
+    bootApp();
+  } catch(e) {
+    showAlert('alert-auth', 'Không thể kết nối AuthService (port 5001). Kiểm tra server đã chạy chưa.');
+  } finally {
+    setLoading('btn-login', false, 'Đăng nhập');
+  }
+}
+
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const role     = document.getElementById('reg-role').value;
+
+  if (!username || !email || !password) { showAlert('alert-auth', 'Vui lòng điền đầy đủ thông tin.'); return; }
+  if (password.length < 6) { showAlert('alert-auth', 'Mật khẩu phải có ít nhất 6 ký tự.'); return; }
+
+  setLoading('btn-register', true, 'Đang tạo...');
+  hideAlert('alert-auth');
+
+  try {
+
+    const res = await fetch(`${AUTH_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password, role })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) {
+      showAlert('alert-auth', data.message || 'Đăng ký thất bại.');
+      return;
+    }
+    saveSession(data.token, data.user);
+    bootApp();
+  } catch(e) {
+    showAlert('alert-auth', 'Không thể kết nối AuthService (port 5001).');
+  } finally {
+    setLoading('btn-register', false, 'Tạo tài khoản');
+  }
+}
+
+function saveSession(token, user) {
+  state.token = token;
+  state.user = user;
+  localStorage.setItem('cm_token', token);
+  localStorage.setItem('cm_user', JSON.stringify(user));
+}
+
+function doLogout() {
+  state.token = null; state.user = null;
+  localStorage.removeItem('cm_token'); localStorage.removeItem('cm_user');
+  document.getElementById('app-screen').style.display = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+
+function bootApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+
+  // Sidebar user info
+  document.getElementById('sidebar-name').textContent = state.user?.username || '—';
+  document.getElementById('sidebar-role').textContent = roleLabel(state.user?.role || 'User');
+  document.getElementById('sidebar-avatar').textContent = initials(state.user?.username || '');
+
+  // Show admin nav
+  if (state.user?.role === 'Admin') {
+    document.getElementById('nav-users').style.display = '';
+  }
+
+  showPage('dashboard');
+}
+
+// ══════════════════ NAVIGATION ══════════════════
+function showPage(page) {
+  state.currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+  const pages = {
+    dashboard: { title: 'Dashboard', fn: renderDashboard },
+    users:     { title: 'Quản lý người dùng', fn: renderUsers },
+    profile:   { title: 'Hồ sơ cá nhân', fn: renderProfile },
+  };
+
+  const p = pages[page];
+  if (!p) return;
+  document.getElementById('topbar-title').textContent = p.title;
+
+  // Highlight nav
+  document.querySelectorAll('.nav-item').forEach(el => {
+    if (el.textContent.includes(p.title.split(' ')[0]) ||
+        (page === 'profile' && el.textContent.includes('Hồ sơ')) ||
+        (page === 'dashboard' && el.textContent.includes('Dashboard'))) {
+      el.classList.add('active');
+    }
+  });
+
+  p.fn();
+}
+
+function showComingSoon(name) {
+  document.getElementById('page-content').innerHTML = `
+    <div class="empty-state" style="margin-top:80px">
+      <i class="ti ti-tool-off" style="font-size:48px; color:var(--hint)"></i>
+      <p style="font-size:16px; font-weight:500; margin-bottom:8px">Chức năng ${name}</p>
+      <p style="color:var(--muted)">Đang phát triển — sẽ có ở các service tiếp theo.</p>
+    </div>`;
+  document.getElementById('topbar-actions').innerHTML = '';
+}
+
+// ══════════════════ DASHBOARD ══════════════════
+function renderDashboard() {
+  document.getElementById('topbar-actions').innerHTML = '';
+  document.getElementById('page-content').innerHTML = `
+  <div class="stat-grid">
+    <div class="stat-card">
+      <div class="stat-icon green"><i class="ti ti-users" aria-hidden="true"></i></div>
+      <div class="stat-label">Người dùng</div>
+      <div class="stat-value">—</div>
+      <div class="stat-sub">Đang tải...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon blue"><i class="ti ti-shopping-cart" aria-hidden="true"></i></div>
+      <div class="stat-label">Đơn hàng</div>
+      <div class="stat-value" style="color:var(--info)">—</div>
+      <div class="stat-sub">Chưa kết nối</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange"><i class="ti ti-hanger" aria-hidden="true"></i></div>
+      <div class="stat-label">Sản phẩm</div>
+      <div class="stat-value" style="color:var(--warn)">—</div>
+      <div class="stat-sub">Chưa kết nối</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red"><i class="ti ti-building-warehouse" aria-hidden="true"></i></div>
+      <div class="stat-label">Tồn kho</div>
+      <div class="stat-value" style="color:var(--danger)">—</div>
+      <div class="stat-sub">Chưa kết nối</div>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+    <div class="section-card">
+      <div class="section-card-header">
+        <h3>Hoạt động gần đây</h3>
+      </div>
+      <div class="section-card-body">
+        <ul class="activity-list">
+          <li class="activity-item">
+            <div class="activity-dot green"></div>
+            <div>
+              <div class="activity-text">Đăng nhập thành công</div>
+              <div class="activity-time">Vừa xong</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-dot blue"></div>
+            <div>
+              <div class="activity-text">AuthService kết nối</div>
+              <div class="activity-time">Hôm nay</div>
+            </div>
+          </li>
+          <li class="activity-item">
+            <div class="activity-dot orange"></div>
+            <div>
+              <div class="activity-text">UserService đang chờ kết nối</div>
+              <div class="activity-time">Port 5002</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-card-header"><h3>Thông tin tài khoản</h3></div>
+      <div class="section-card-body">
+        <table style="width:100%; font-size:13.5px">
+          <tr>
+            <td style="color:var(--muted); padding:7px 0">Username</td>
+            <td style="font-weight:500">${state.user?.username || '—'}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted); padding:7px 0">Email</td>
+            <td>${state.user?.email || '—'}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted); padding:7px 0">Vai trò</td>
+            <td>${roleBadge(state.user?.role || 'User')}</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted); padding:7px 0">Auth Service</td>
+            <td><span class="badge active"><i class="ti ti-circle-filled" style="font-size:8px"></i> Kết nối</span></td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted); padding:7px 0">User Service</td>
+            <td><span id="user-service-status"><span class="badge inactive">Đang kiểm tra...</span></span></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>`;
+
+  // Ping UserService health
+  fetch(`${USER_URL}/api/users/health`)
+    .then(r => r.ok ? r.json() : null)
+    .then(d => {
+      const el = document.getElementById('user-service-status');
+      if (el) el.innerHTML = d
+        ? `<span class="badge active"><i class="ti ti-circle-filled" style="font-size:8px"></i> Kết nối</span>`
+        : `<span class="badge inactive">Không kết nối</span>`;
+    })
+    .catch(() => {
+      const el = document.getElementById('user-service-status');
+      if (el) el.innerHTML = `<span class="badge inactive">Không kết nối (port 5002)</span>`;
+    });
+}
+
+// ══════════════════ USERS (Admin) ══════════════════
+async function renderUsers() {
+  if (state.user?.role !== 'Admin') {
+    document.getElementById('page-content').innerHTML =
+      `<div class="empty-state"><i class="ti ti-lock"></i><p>Bạn không có quyền truy cập trang này.</p></div>`;
+    return;
+  }
+
+  document.getElementById('topbar-actions').innerHTML = '';
+
+  document.getElementById('page-content').innerHTML = `
+  <div class="toolbar">
+    <div class="search-box">
+      <i class="ti ti-search" aria-hidden="true"></i>
+      <input type="text" id="user-search" placeholder="Tìm theo tên, số điện thoại..." oninput="onSearchUsers(this.value)"/>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Người dùng</th>
+          <th>Vai trò</th>
+          <th>Phòng ban</th>
+          <th>Điện thoại</th>
+          <th>Ngày tạo</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="user-table-body">
+        <tr><td colspan="6" style="text-align:center; padding:32px; color:var(--muted)">
+          <span class="spinner"></span> Đang tải...
+        </td></tr>
+      </tbody>
+    </table>
+    <div class="pagination" id="user-pagination" style="display:none"></div>
+  </div>`;
+
+  await loadUsers();
+}
+
+let searchTimer;
+function onSearchUsers(val) {
+  clearTimeout(searchTimer);
+  state.userSearch = val;
+  state.usersPage = 1;
+  searchTimer = setTimeout(loadUsers, 350);
+}
+
+async function loadUsers() {
+  try {
+    const params = new URLSearchParams({
+      page: state.usersPage,
+      pageSize: 8,
+      ...(state.userSearch ? { search: state.userSearch } : {})
+    });
+    const res = await fetch(`${USER_URL}/api/users?${params}`, { headers: headers() });
+    if (res.status === 403) {
+      document.getElementById('user-table-body').innerHTML =
+        `<tr><td colspan="6" style="text-align:center; color:var(--danger); padding:24px">Không có quyền truy cập.</td></tr>`;
+      return;
+    }
+    if (!res.ok) throw new Error('Lỗi server');
+    const data = await res.json();
+    state.users = data.items || [];
+    state.usersTotal = data.totalCount || 0;
+    renderUserTable(data);
+  } catch(e) {
+    document.getElementById('user-table-body').innerHTML = `
+      <tr><td colspan="6" style="text-align:center; color:var(--danger); padding:24px">
+        <i class="ti ti-alert-circle"></i> Không kết nối được UserService (port 5002)
+      </td></tr>`;
+  }
+}
+
+function renderUserTable(data) {
+  const tbody = document.getElementById('user-table-body');
+  if (!data.items?.length) {
+    tbody.innerHTML = `<tr><td colspan="6">
+      <div class="empty-state"><i class="ti ti-users-off"></i><p>Không tìm thấy người dùng nào.</p></div>
+    </td></tr>`;
+    document.getElementById('user-pagination').style.display = 'none';
+    return;
+  }
+
+  tbody.innerHTML = data.items.filter(u => u.authUserId !== state.user?.id).map(u => `
+    <tr>
+      <td>
+        <div style="display:flex; align-items:center; gap:10px">
+          <div class="avatar" style="width:34px;height:34px;font-size:12px">${initials(u.fullName)}</div>
+          <div>
+            <div style="font-weight:500">${u.fullName || '—'}</div>
+            <div style="font-size:12px; color:var(--muted)">${u.authUserId?.slice(-8) || ''}</div>
+          </div>
+        </div>
+      </td>
+      <td>—</td>
+      <td>${u.department || '<span style="color:var(--hint)">—</span>'}</td>
+      <td>${u.phone || '<span style="color:var(--hint)">—</span>'}</td>
+      <td>${fmtDate(u.createdAt)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-sm" onclick="openEditUser('${u.authUserId}')" title="Sửa">
+          <i class="ti ti-pencil" aria-hidden="true"></i>
+        </button>
+        <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.authUserId}')" title="Xóa">
+          <i class="ti ti-trash" aria-hidden="true"></i>
+        </button>
+      </td>
+    </tr>`).join('');
+
+  // Pagination
+  const pg = document.getElementById('user-pagination');
+  if (data.totalPages > 1) {
+    pg.style.display = 'flex';
+    const pages = Array.from({length: data.totalPages}, (_, i) => i+1);
+    pg.innerHTML = `
+      <span>${data.totalCount} người dùng</span>
+      <div class="page-btns">
+        <div class="page-btn" onclick="changePage(${state.usersPage - 1})">
+          <i class="ti ti-chevron-left" aria-hidden="true"></i>
+        </div>
+        ${pages.map(p => `<div class="page-btn ${p === state.usersPage ? 'active' : ''}" onclick="changePage(${p})">${p}</div>`).join('')}
+        <div class="page-btn" onclick="changePage(${state.usersPage + 1})">
+          <i class="ti ti-chevron-right" aria-hidden="true"></i>
+        </div>
+      </div>`;
+  } else {
+    pg.style.display = 'none';
+  }
+}
+
+function changePage(p) {
+  const max = Math.ceil(state.usersTotal / 8);
+  if (p < 1 || p > max) return;
+  state.usersPage = p;
+  loadUsers();
+}
+
+function openEditUser(authUserId) {
+  const u = state.users.find(x => x.authUserId === authUserId);
+  if (!u) return;
+  document.getElementById('edit-auth-user-id').value = authUserId;
+  document.getElementById('edit-username').value = u.username || '';
+  document.getElementById('edit-email').value = u.email || '';
+  document.getElementById('edit-role').value = u.role || 'User';
+  document.getElementById('edit-fullname').value = u.fullName || '';
+  document.getElementById('edit-jobtitle').value = u.jobTitle || 'Khác';
+  document.getElementById('edit-phone').value = u.phone || '';
+  hideAlert('edit-modal-alert');
+  openModal('modal-edit-user');
+}
+
+async function submitEditUser() {
+  const authUserId = document.getElementById('edit-auth-user-id').value;
+  const username   = document.getElementById('edit-username').value.trim();
+  const email      = document.getElementById('edit-email').value.trim();
+  const role       = document.getElementById('edit-role').value;
+  const fullName   = document.getElementById('edit-fullname').value.trim();
+  const jobTitle   = document.getElementById('edit-jobtitle').value;
+  const phone      = document.getElementById('edit-phone').value.trim();
+
+  if (!username || !email || !fullName) {
+    showAlert('edit-modal-alert', 'Vui lòng điền đầy đủ tên đăng nhập, email và họ tên.');
+    return;
+  }
+
+  setLoading('btn-save-edit-user', true, 'Đang lưu...');
+  hideAlert('edit-modal-alert');
+  try {
+    // Update auth account
+    const resAuth = await fetch(`${AUTH_URL}/api/auth/admin/${authUserId}`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ username, email, role })
+    });
+    if (!resAuth.ok) {
+      const d = await resAuth.json().catch(() => ({}));
+      showAlert('edit-modal-alert', d.message || 'Cập nhật tài khoản thất bại.');
+      return;
+    }
+
+    // Update profile — also sync jobTitle
+    const resProfile = await fetch(`${USER_URL}/api/users/${authUserId}`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ fullName, email, jobTitle, phone: phone || null })
+    });
+    if (!resProfile.ok) {
+      const d = await resProfile.json().catch(() => ({}));
+      showAlert('edit-modal-alert', d.message || 'Cập nhật hồ sơ thất bại.');
+      return;
+    }
+
+    closeModal('modal-edit-user');
+    toast('Đã cập nhật người dùng.', 'success');
+    loadUsers();
+  } catch {
+    showAlert('edit-modal-alert', 'Lỗi kết nối server.');
+  } finally {
+    setLoading('btn-save-edit-user', false, '<i class="ti ti-device-floppy"></i> Lưu thay đổi');
+  }
+}
+
+async function deleteUser(authUserId) {
+  if (!confirm('Xác nhận xóa profile người dùng này?')) return;
+  try {
+    const res = await fetch(`${USER_URL}/api/users/${authUserId}`, {
+      method: 'DELETE', headers: headers()
+    });
+    if (res.ok) {
+      toast('Đã xóa người dùng.', 'success');
+      loadUsers();
+    } else {
+      toast('Xóa thất bại.', 'error');
+    }
+  } catch { toast('Lỗi kết nối.', 'error'); }
+}
+
+async function submitAddUser() {
+  const username = document.getElementById('modal-username').value.trim();
+  const email    = document.getElementById('modal-email').value.trim();
+  const password = document.getElementById('modal-password').value;
+  const role     = document.getElementById('modal-role').value;
+
+  if (!username || !email || !password) {
+    showAlert('modal-alert', 'Vui lòng điền đầy đủ.'); return;
+  }
+
+  setLoading('btn-add-user', true, 'Đang tạo...');
+  try {
+    // 1) Register bên AuthService
+    const res1 = await fetch(`${AUTH_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password, role })
+    });
+    const d1 = await res1.json();
+    if (!res1.ok || !d1.success) {
+      showAlert('modal-alert', d1.message || 'Đăng ký thất bại.');
+      return;
+    }
+
+    // 2) Tạo profile bên UserService bằng token của admin
+    await fetch(`${USER_URL}/api/users/${d1.user.id}`, {
+      method: 'GET', headers: headers()
+    }).catch(() => {});
+
+    closeModal('modal-add-user');
+    ['modal-username','modal-email','modal-password'].forEach(id => document.getElementById(id).value = '');
+    hideAlert('modal-alert');
+    toast('Tạo tài khoản thành công!', 'success');
+    loadUsers();
+  } catch(e) {
+    showAlert('modal-alert', 'Lỗi kết nối server.');
+  } finally {
+    setLoading('btn-add-user', false, '<i class="ti ti-plus"></i> Tạo tài khoản');
+  }
+}
+
+// ══════════════════ PROFILE ══════════════════
+async function renderProfile() {
+  document.getElementById('topbar-actions').innerHTML = `
+    <button class="btn" onclick="openModal('modal-change-pw')">
+      <i class="ti ti-lock" aria-hidden="true"></i> Đổi mật khẩu
+    </button>`;
+
+  document.getElementById('page-content').innerHTML = `
+  <div class="profile-layout">
+    <div class="profile-card">
+      <div class="profile-avatar" id="pf-avatar">${initials(state.user?.username)}</div>
+      <div class="profile-name" id="pf-name">${state.user?.username || '—'}</div>
+      <div class="profile-email" id="pf-email">${state.user?.email || '—'}</div>
+      <div style="margin-bottom:20px">${roleBadge(state.user?.role || 'User')}</div>
+      <div style="border-top:0.5px solid var(--border); padding-top:16px; text-align:left">
+        <div style="font-size:12px; color:var(--muted); margin-bottom:4px">Auth User ID</div>
+        <div style="font-family:'DM Mono',monospace; font-size:11px; color:var(--hint); word-break:break-all">${state.user?.id || '—'}</div>
+      </div>
+    </div>
+
+    <div class="profile-form-card">
+      <div id="profile-form-content">
+        <div style="text-align:center; padding:32px; color:var(--muted)">
+          <span class="spinner"></span> Đang tải hồ sơ...
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+  await loadProfile();
+}
+
+async function loadProfile() {
+  try {
+    const res = await fetch(`${USER_URL}/api/users/me`, { headers: headers() });
+    if (res.status === 404) {
+      state.profile = null;
+      renderProfileForm(null);
+      return;
+    }
+    if (!res.ok) throw new Error();
+    state.profile = await res.json();
+    renderProfileForm(state.profile);
+  } catch(e) {
+    document.getElementById('profile-form-content').innerHTML = `
+      <div class="empty-state">
+        <i class="ti ti-alert-circle"></i>
+        <p>Không kết nối được UserService (port 5002)</p>
+        <button class="btn" style="margin-top:12px" onclick="loadProfile()">Thử lại</button>
+      </div>`;
+  }
+}
+
+function renderProfileForm(profile) {
+  const isNew = !profile;
+  document.getElementById('profile-form-content').innerHTML = `
+    <div class="section-title">Thông tin cá nhân</div>
+    <div class="form-row">
+      <div class="form-group-inline">
+        <label>Họ và tên</label>
+        <input type="text" id="pf-fullname" value="${profile?.fullName || ''}" placeholder="Nguyễn Văn A"/>
+      </div>
+      <div class="form-group-inline">
+        <label>Số điện thoại</label>
+        <input type="text" id="pf-phone" value="${profile?.phone || ''}" placeholder="0901234567"/>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline">
+        <label>Giới tính</label>
+        <select id="pf-gender">
+          <option value="">— Chọn —</option>
+          <option value="Male" ${profile?.gender === 'Male' ? 'selected' : ''}>Nam</option>
+          <option value="Female" ${profile?.gender === 'Female' ? 'selected' : ''}>Nữ</option>
+          <option value="Other" ${profile?.gender === 'Other' ? 'selected' : ''}>Khác</option>
+        </select>
+      </div>
+      <div class="form-group-inline">
+        <label>Ngày sinh</label>
+        <input type="date" id="pf-dob" value="${profile?.dateOfBirth ? profile.dateOfBirth.split('T')[0] : ''}"/>
+      </div>
+    </div>
+    <div class="form-group-inline">
+      <label>Chức vụ</label>
+      <select id="pf-jobtitle">
+        <option value="Khác" ${(profile?.jobTitle || 'Khác') === 'Khác' ? 'selected' : ''}>Khác</option>
+        <option value="Admin" ${profile?.jobTitle === 'Admin' ? 'selected' : ''}>Admin</option>
+        <option value="Quản lý" ${profile?.jobTitle === 'Quản lý' ? 'selected' : ''}>Quản lý</option>
+        <option value="Nhân viên bán hàng" ${profile?.jobTitle === 'Nhân viên bán hàng' ? 'selected' : ''}>Nhân viên bán hàng</option>
+        <option value="Nhân viên kho" ${profile?.jobTitle === 'Nhân viên kho' ? 'selected' : ''}>Nhân viên kho</option>
+        <option value="Kế toán" ${profile?.jobTitle === 'Kế toán' ? 'selected' : ''}>Kế toán</option>
+        <option value="Kinh doanh" ${profile?.jobTitle === 'Kinh doanh' ? 'selected' : ''}>Kinh doanh</option>
+        <option value="Kỹ thuật" ${profile?.jobTitle === 'Kỹ thuật' ? 'selected' : ''}>Kỹ thuật</option>
+      </select>
+    </div>
+
+    <div class="section-title">Địa chỉ</div>
+    <div class="form-group-inline">
+      <label>Số nhà / Đường</label>
+      <input type="text" id="pf-street" value="${profile?.address?.street || ''}" placeholder="123 Lê Lợi"/>
+    </div>
+    <div class="form-row">
+      <div class="form-group-inline">
+        <label>Thành phố</label>
+        <input type="text" id="pf-city" value="${profile?.address?.city || ''}" placeholder="TP. Hồ Chí Minh"/>
+      </div>
+      <div class="form-group-inline">
+        <label>Tỉnh / Vùng</label>
+        <input type="text" id="pf-province" value="${profile?.address?.province || ''}" placeholder="HCM"/>
+      </div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; margin-top:20px; gap:8px">
+      ${!isNew ? '' : `<span style="font-size:12px; color:var(--muted); align-self:center">
+        <i class="ti ti-info-circle"></i> Chưa có hồ sơ — nhấn Lưu để tạo mới
+      </span>`}
+      <button class="btn btn-green" id="btn-save-profile" onclick="saveProfile(${isNew})">
+        <i class="ti ti-device-floppy" aria-hidden="true"></i> ${isNew ? 'Tạo hồ sơ' : 'Lưu thay đổi'}
+      </button>
+    </div>`;
+
+  // Hide Admin option for non-admin users
+  if (state.user?.role !== 'Admin') {
+    const sel = document.getElementById('pf-jobtitle');
+    if (sel) {
+      const adminOpt = Array.from(sel.options).find(o => o.value === 'Admin');
+      if (adminOpt) adminOpt.remove();
+    }
+  }
+
+  // Update sidebar avatar if fullname known
+  if (profile?.fullName) {
+    document.getElementById('pf-avatar').textContent = initials(profile.fullName);
+    document.getElementById('pf-name').textContent = profile.fullName;
+  }
+}
+
+async function saveProfile(isNew) {
+  const body = {
+    authUserId: state.user?.id || '',
+    fullName:   document.getElementById('pf-fullname').value.trim(),
+    phone:      document.getElementById('pf-phone').value.trim() || null,
+    gender:     document.getElementById('pf-gender').value || null,
+    dateOfBirth: document.getElementById('pf-dob').value || null,
+    jobTitle:   document.getElementById('pf-jobtitle').value || null,
+    address: {
+      street:   document.getElementById('pf-street').value.trim() || null,
+      city:     document.getElementById('pf-city').value.trim() || null,
+      province: document.getElementById('pf-province').value.trim() || null,
+    }
+  };
+
+  if (!body.fullName) { toast('Vui lòng nhập họ và tên.', 'error'); return; }
+
+  setLoading('btn-save-profile', true, 'Đang lưu...');
+  try {
+    let res;
+    if (isNew) {
+      res = await fetch(`${USER_URL}/api/users/me`, {
+        method: 'POST', headers: headers(), body: JSON.stringify(body)
+      });
+    } else {
+      res = await fetch(`${USER_URL}/api/users/me`, {
+        method: 'PUT', headers: headers(), body: JSON.stringify(body)
+      });
+    }
+    if (res.ok) {
+      const saved = await res.json().catch(() => null);
+      state.profile = saved || body;
+      toast(isNew ? 'Đã tạo hồ sơ!' : 'Đã lưu thay đổi!', 'success');
+      renderProfileForm(state.profile);
+    } else {
+      const d = await res.json().catch(() => ({}));
+      toast(d.message || 'Lưu thất bại.', 'error');
+    }
+  } catch(e) { toast('Lỗi kết nối UserService.', 'error'); }
+  finally {
+    setLoading('btn-save-profile', false, `<i class="ti ti-device-floppy"></i> ${isNew ? 'Tạo hồ sơ' : 'Lưu thay đổi'}`);
+  }
+}
+
+// ══════════════════ CHANGE PASSWORD ══════════════════
+async function submitChangePw() {
+  const oldPw  = document.getElementById('old-password').value;
+  const newPw  = document.getElementById('new-password').value;
+  const confPw = document.getElementById('confirm-password').value;
+
+  if (!oldPw || !newPw || !confPw) { showAlert('modal-pw-alert', 'Vui lòng điền đầy đủ.'); return; }
+  if (newPw.length < 6) { showAlert('modal-pw-alert', 'Mật khẩu mới phải có ít nhất 6 ký tự.'); return; }
+  if (newPw !== confPw) { showAlert('modal-pw-alert', 'Mật khẩu xác nhận không khớp.'); return; }
+
+  setLoading('btn-change-pw', true, 'Đang cập nhật...');
+  hideAlert('modal-pw-alert');
+  try {
+    const res = await fetch(`${AUTH_URL}/api/auth/change-password`, {
+      method: 'PUT', headers: headers(),
+      body: JSON.stringify({ oldPassword: oldPw, newPassword: newPw })
+    });
+    const d = await res.json();
+    if (res.ok && d.success) {
+      closeModal('modal-change-pw');
+      ['old-password','new-password','confirm-password'].forEach(id => document.getElementById(id).value = '');
+      toast('Đổi mật khẩu thành công!', 'success');
+    } else {
+      showAlert('modal-pw-alert', d.message || 'Đổi mật khẩu thất bại.');
+    }
+  } catch { showAlert('modal-pw-alert', 'Lỗi kết nối AuthService.'); }
+  finally {
+    setLoading('btn-change-pw', false, '<i class="ti ti-lock"></i> Đổi mật khẩu');
+  }
+}
+
+// ══════════════════ INIT ══════════════════
+window.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (state.currentPage === 'login' || document.getElementById('auth-screen').style.display !== 'none') {
+      const form = document.getElementById('form-login').style.display === 'none' ? 'register' : 'login';
+      form === 'login' ? doLogin() : doRegister();
+    }
+  }
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-backdrop.show').forEach(m => m.classList.remove('show'));
+  }
+});
+
+// Auto-restore session
+if (state.token && state.user) {
+  bootApp();
+} else {
+  document.getElementById('auth-screen').style.display = 'flex';
+}
+</script>
+</body>
+</html>
